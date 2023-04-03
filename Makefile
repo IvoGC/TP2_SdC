@@ -11,7 +11,7 @@ $(lib)/librequests.so: $(out)/requests.o
 
 $(out)/requests.o: $(src)/requests.c
 	mkdir -p $(out)/
-	gcc $(CFLAGS) -o $@ -c $^
+	gcc $(CFLAGS) -o $@ -c -fPIC $^ 
 
 
 clean:

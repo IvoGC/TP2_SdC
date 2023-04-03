@@ -1,10 +1,11 @@
 #include "../include/requests.h"
 
-Prices getPrices() {
+Prices getPrices(float toConvert, float priceUsd, float priceEur, float priceArs) {
+
     Prices prices;
-    prices.usd=10;
-    prices.euros=20;
-    prices.pesos=30;
+    prices.usd=toConvert*priceUsd;
+    prices.euros=toConvert*priceEur;
+    prices.pesos=toConvert*priceArs;
 
     return prices;
 }
