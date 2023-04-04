@@ -34,14 +34,7 @@ segment .text
         global asm_mult
 asm_mult:
                     
-        push            rbp
-        mov             rbp, rsp
-        
+               
         mulss           xmm0, xmm1
         
-        movd            eax, xmm0
-        
-        mov             rsp, rbp
-        pop             rbp
-
         ret
