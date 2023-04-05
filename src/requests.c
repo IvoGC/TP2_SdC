@@ -1,7 +1,7 @@
 #include "../include/requests.h"
 #include "../include/cdecl.h"
 
-float PRE_CDECL asm_mult(float, float) POST_CDECL;
+float asm_mult(float, float);
 
 static float mult(float operator1, float operator2) {
     float res;
