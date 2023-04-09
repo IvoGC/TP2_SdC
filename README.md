@@ -2,6 +2,11 @@
 Trabajo practico 2 de sistemas de Computacion
 
 # Aplicación de conversión de cripto monedas
+Se realizaron dos aplicaciones para la conversión de cripto monedas, en los directorios `python` y `c` se podrán encontrar las correspondientes aplicaciones.
+
+![Repositorio del proyecto](https://github.com/IvoGC/TP2_SdC)
+
+## Aplicación Python
 La aplicación está desarrollada en tres capas. La capa más alta está escrita en python y se encarga de la request a la API y de la presentación de los datos a través de una interfaz gráfica.
 
 Esta aplicación de python hace uso de una librería dinámica generada con código en C y en assembler. Para multiplicar el dato que ingresa el usuario por los resultados obtenidos de la request a la API.
@@ -63,6 +68,78 @@ asm_mult:
 La operación `mulss` multiplica dos valores de punto flotante, y como el resultado queda en xmm0, ya se puede salir de la función ya que allí estará presente el resultado que se necesita en la función de C.
 
 ![image](https://user-images.githubusercontent.com/83674694/230092311-d3325967-de44-4d06-a12f-cabf60d0174c.png)
+
+## Aplicación C
+Esta aplicación está desarrollada solo en lenguaje C y assembler para una subrutina específica (multipĺicación). El código `apiRequest.c` hace uso de la librería `-libcurl` para realizar la consulta a la api. Una vez realizada la consulta coloca en su standar output el resultado, luego el otro programa hará uso de esta salida.
+
+Para poder obtener estos resultados, el segundo código `converter.c` realiza un fork para ejecutar el binario anterior, y mediante un pipe con su hijo, obtiene la salida. Esta salida es utilizada para obtener la conversión del número ingresado por el usuario.
+Si analizamos el makefile del proyecto podemos observar que se generaran dos archivos binarios, el que efectivamente lanzará la aplicación es `converter`
+
+```Makefile
+CFLAGS = -g -pedantic 
+include = ./include
+src = ./src
+out = ./out
+lib = ./lib
+bin = ./bin
+
+all: api converter
+
+api: $(bin)/apiRequest
+$(bin)/apiRequest: $(src)/apiRequest.c
+	mkdir -p $(bin)
+	gcc $(CFLAGS) -o $@ $^ -lcurl -lcjson
+
+converter: $(bin)/converter 
+$(bin)/converter: $(src)/converter.c $(out)/mult.o $(out)/asm_io.o
+	gcc $(CFLAGS) -o $@ -m32 $^
+
+$(out)/mult.o: $(src)/mult.asm
+	mkdir -p $(out)/
+	nasm -f elf32 -o $@ $^
+
+$(out)/asm_io.o: $(src)/asm_io.asm
+	nasm -f elf32 -d ELF_TYPE -o $@ $^
+
+clean:
+	rm -rf $(bin)/ $(out)/
+
+```
+Podemos ver que la subrutina de multiplicación se encuentra definida en el código fuente `mult.o`, la función se llama `asm_mul` y es llamada desde el `converter.c` tres veces. La subrutina es la siguiente: 
+
+```assembly
+%include "./include/asm_io.inc"
+
+segment .data
+
+segment .bss
+
+segment .text
+
+        global asm_mult
+
+asm_mult:
+
+        enter           4,0
+        
+        mov             dword [ebp-4], 0
+        mov             eax, [ebp+8]
+        mov             ebx, [ebp+12]
+        imul            ebx, eax
+        mov             [ebp-4], ebx
+        mov             eax, ebx
+        dump_stack      1, 1, 3
+
+        leave        
+        ret
+```
+En la misma se hace un uso innecesario de variables locales, el único propósito es para visualizar como se comporta el stackFrame. Se utilizan funcionalidades definidas en `asm_io.asm` para imprimir el stack y poder analizarlo.
+
+Podemos analizar una salida de ejecución de la aplicación
+
+![image](https://user-images.githubusercontent.com/83674694/230749252-5540a20a-68fd-466d-a00f-82873b89ca09.png)
+
+Aquí puede notarse como coinciden los números presentes en el stack con las salidas de la función.
 
 ## Análisis del stack frame de una aplicación en Assembly
 Debido a que en el ejercicio anterior no pudimos realizar el análisis de un stack frame debido a que no necesitamos utilizarlo, ejecutaremos una aplicación de los ejemplos de Paul Carter para analizar esto puntualmente.
