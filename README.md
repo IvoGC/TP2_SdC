@@ -142,7 +142,7 @@ Podemos analizar una salida de ejecución de la aplicación
 Aquí puede notarse como coinciden los números presentes en el stack con las salidas de la función.
 
 ## Análisis del stack frame de una aplicación en Assembly
-Debido a que en el ejercicio anterior no pudimos realizar el análisis de un stack frame debido a que no necesitamos utilizarlo, ejecutaremos una aplicación de los ejemplos de Paul Carter para analizar esto puntualmente.
+Para terminar de comprender el comportamiento del stackFrame en una aplicación, se realizó el siguiente análisis de un programa de ejemplo de Paul Carter.
 
 ```C
 #include <stdio.h>
