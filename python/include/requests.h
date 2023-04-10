@@ -7,6 +7,6 @@ typedef struct prices{
     float pesos;
 } Prices;
 
-Prices getPrices();
+Prices getPrices(float toConvert, float priceUsd, float priceEur, float priceArs);
 
 #endif /*REQUESTS_H*/
